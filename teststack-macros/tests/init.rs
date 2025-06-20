@@ -1,5 +1,4 @@
 use testcontainers_modules::rabbitmq::RabbitMq;
-use testcontainers_modules::testcontainers::{ContainerRequest, ImageExt};
 use teststack::DbContainer;
 use teststack::{stack, ContainerPort, CustomContainer};
 
@@ -30,8 +29,8 @@ impl teststack::Init<TestConfig> for DbContainer {
     }
 }
 
-fn rabbit() -> ContainerRequest<RabbitMq> {
-    RabbitMq::default().with_tag("3.11.0-alpine")
+fn rabbit() -> RabbitMq {
+    RabbitMq::default()
 }
 
 struct RabbitConnection(lapin::Connection);
