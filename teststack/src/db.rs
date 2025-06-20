@@ -10,6 +10,7 @@ pub enum DbName {
     Default,
 }
 
+/// Configuration for the database connection.
 pub struct DbConf {
     /// Database URL to connect to the database.
     pub url: String,

@@ -24,6 +24,21 @@ impl Parse for Container {
     }
 }
 
+/// Configure the stack of containers for a test.
+///
+/// Example:
+/// ```rust
+/// use teststack::stack;
+/// #[stack(postgres(db_name = "test"))]
+/// #[tokio::test]
+/// async fn test(pool: sqlx::PgPool) {
+///    let db_name: String = sqlx::query_scalar("SELECT current_database()")
+///        .fetch_one(&pool)
+///        .await
+///        .unwrap();
+///    assert_eq!(db_name, "test");
+/// }
+/// ```
 #[proc_macro_attribute]
 pub fn stack(attr: TokenStream, item: TokenStream) -> TokenStream {
     let containers =

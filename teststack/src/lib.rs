@@ -37,7 +37,7 @@ pub async fn container<I: Image + 'static>(
     }
 }
 
-/// Start a stack of containers.
+/// Start a stack of containers concurrently.
 pub async fn stack<I: Image + 'static>(
     containers: Vec<impl Into<ContainerRequest<I>> + AsyncRunner<I> + Send + Sync + 'static>,
 ) -> Vec<GenericContainer> {
@@ -48,6 +48,7 @@ pub async fn stack<I: Image + 'static>(
     set.join_all().await
 }
 
+/// Represents a running container.
 pub trait RunningContainer: Send + Sync {
     /// Get the docker container ID.
     fn id(&self) -> &str;
