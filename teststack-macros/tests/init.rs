@@ -1,8 +1,10 @@
+use std::ops::Deref;
+
 use testcontainers_modules::rabbitmq::RabbitMq;
 use teststack::DbContainer;
 use teststack::{stack, ContainerPort, CustomContainer};
 
-#[stack(postgres(random_db_name), container(rabbit()))]
+#[stack(postgres(random_db_name), container(RabbitMq::default()))]
 #[tokio::test]
 async fn test(conf: TestConfig, rabbit: RabbitConnection) {
     let pool = sqlx::PgPool::connect(conf.url.as_str())
@@ -13,7 +15,6 @@ async fn test(conf: TestConfig, rabbit: RabbitConnection) {
         .await
         .expect("failed to execute query");
     rabbit
-        .0
         .create_channel()
         .await
         .expect("failed to create channel");
@@ -29,11 +30,14 @@ impl teststack::Init<TestConfig> for DbContainer {
     }
 }
 
-fn rabbit() -> RabbitMq {
-    RabbitMq::default()
-}
-
 struct RabbitConnection(lapin::Connection);
+
+impl Deref for RabbitConnection {
+    type Target = lapin::Connection;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 impl teststack::Init<RabbitConnection> for CustomContainer {
     async fn init(self) -> RabbitConnection {

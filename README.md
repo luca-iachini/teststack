@@ -59,7 +59,6 @@ use teststack::{ContainerPort, CustomContainer, stack};
 #[tokio::test]
 async fn test(rabbit: RabbitConnection) {
     rabbit
-        .0
         .create_channel()
         .await
         .expect("failed to create channel");
@@ -70,6 +69,13 @@ fn rabbit() -> ContainerRequest<RabbitMq> {
 }
 
 struct RabbitConnection(lapin::Connection);
+
+impl std::ops::Deref for RabbitConnection {
+    type Target = lapin::Connection;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 impl teststack::Init<RabbitConnection> for CustomContainer {
     async fn init(self) -> RabbitConnection {
@@ -91,30 +97,12 @@ If you don't need any custom configuration, you can simplify the container setup
 
 ```rust
 use testcontainers_modules::rabbitmq::RabbitMq;
+use teststack::{CustomContainer, stack};
 
-fn rabbit() -> RabbitMq {
-    RabbitMq::default()
-}
-
-```
-
-# Database Utilities
-
-Enable a specific feature (`postgres`, `mysql`) to run dedicated database containers:
-
-```rust
-use teststack::{DbContainer, stack};
-
-#[stack(postgres(random_db_name))]
+#[stack(container(RabbitMq::default()))]
 #[tokio::test]
-async fn test(container: DbContainer) {
-    let pool = sqlx::PgPool::connect(container.conf.url.as_str())
-        .await
-        .expect("failed to connect to database");
-    sqlx::query("SELECT 1")
-        .fetch_one(&pool)
-        .await
-        .expect("failed to execute query");
+async fn test(rabbit: CustomContainer) {
+    // test
 }
 ```
 

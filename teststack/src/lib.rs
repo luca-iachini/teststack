@@ -141,6 +141,7 @@ static REMOVE_CONTAINERS: Lazy<mpsc::Sender<mpsc::Sender<()>>> = Lazy::new(|| {
     tx
 });
 
+#[cfg(feature = "macros")]
 pub use teststack_macros::stack;
 
 pub use custom::{run as custom, CustomContainer};

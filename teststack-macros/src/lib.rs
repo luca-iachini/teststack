@@ -43,36 +43,30 @@ fn expand_test(input: ItemFn, containers: Vec<Container>) -> TokenStream {
         .iter()
         .any(|attr| attr.path().segments.iter().any(|s| s.ident == "sqlx"));
 
+    let container_vars = (0..containers.len())
+        .map(|i| format_ident!("container_{i}"))
+        .collect::<Vec<_>>();
+
     let containers = containers
         .iter()
-        .enumerate()
-        .map(|(i, container)| {
-            let var_name = format_ident!("container_{i}");
-            match container {
-                Container::Db(db) => {
-                    let db_name = match &db.conf.db_name {
-                        DbName::Random => quote! {::teststack::DbName::Random },
-                        DbName::Static(name) => {
-                            quote! {::teststack::DbName::Static(#name.to_string()) }
-                        }
-                        DbName::Default => quote! { ::teststack::DbName::Default },
-                    };
-                    match db.name {
-                        "postgres" => quote! {
-                                let #var_name = ::teststack::postgres(#db_name).await;
-                        },
-                        "mysql" => quote! {
-                            let #var_name = ::teststack::mysql(#db_name).await;
-                        },
-                        _ => panic!("Unknown container type: {}", name),
+        .map(|container| match container {
+            Container::Db(db) => {
+                let db_name = match &db.conf.db_name {
+                    DbName::Random => quote! {::teststack::DbName::Random },
+                    DbName::Static(name) => {
+                        quote! {::teststack::DbName::Static(#name.to_string()) }
                     }
+                    DbName::Default => quote! { ::teststack::DbName::Default },
+                };
+                match db.name {
+                    "postgres" => quote! { ::teststack::postgres(#db_name) },
+                    "mysql" => quote! { ::teststack::mysql(#db_name) },
+                    _ => panic!("Unknown container type: {}", name),
                 }
-                Container::Custom(custom) => {
-                    let expr = &custom.expr;
-                    quote! {
-                        let #var_name = ::teststack::custom(#expr).await;
-                    }
-                }
+            }
+            Container::Custom(custom) => {
+                let expr = &custom.expr;
+                quote! { ::teststack::custom(#expr) }
             }
         })
         .collect::<Vec<_>>();
@@ -82,12 +76,12 @@ fn expand_test(input: ItemFn, containers: Vec<Container>) -> TokenStream {
             #[allow(unnameable_test_items)]
             #[::core::prelude::v1::test]
             fn #name() #ret {
-                let rt = tokio::runtime::Builder::new_current_thread()
+                let rt = ::tokio::runtime::Builder::new_current_thread()
                     .enable_all()
                     .build()
                     .unwrap();
                 rt.block_on(async {
-                    #(#containers)*
+                    ::tokio::join!(#(#containers),*);
                 });
                 #(#attrs)*
                 fn #name(#args) #ret {
@@ -111,7 +105,7 @@ fn expand_test(input: ItemFn, containers: Vec<Container>) -> TokenStream {
             #(#attrs)*
             async fn #name() #ret {
                 use ::teststack::Init;
-                #(#containers)*
+               let (#(#container_vars),*,) = ::tokio::join!(#(#containers),*);
                 async fn #name(#args) #ret {
                     #body
                 }

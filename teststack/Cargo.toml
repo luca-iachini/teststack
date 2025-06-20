@@ -9,8 +9,10 @@ readme.workspace = true
 version.workspace = true
 
 [features]
+default = ["macros"]
 postgres = ["sqlx/postgres", "testcontainers-modules/postgres"]
 mysql = ["sqlx/mysql", "testcontainers-modules/mysql"]
+macros = ["dep:teststack-macros"]
 
 
 [dependencies]
@@ -21,7 +23,7 @@ tokio = { version = "1.44.2", default-features = false, features = [
 	"rt",
 	"signal",
 ] }
-teststack-macros = { workspace = true }
+teststack-macros = { workspace = true, optional = true }
 ctor = "0.4.2"
 uuid = { version = "1.2.2", features = ["v4"] }
 dashmap = { version = "6.1.0" }
