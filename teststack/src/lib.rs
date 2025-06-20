@@ -37,6 +37,7 @@ pub async fn container<I: Image + 'static>(
     }
 }
 
+/// Start a stack of containers.
 pub async fn stack<I: Image + 'static>(
     containers: Vec<impl Into<ContainerRequest<I>> + AsyncRunner<I> + Send + Sync + 'static>,
 ) -> Vec<GenericContainer> {
@@ -126,17 +127,13 @@ static REMOVE_CONTAINERS: Lazy<mpsc::Sender<mpsc::Sender<()>>> = Lazy::new(|| {
             .build()
             .unwrap();
         rt.block_on(async {
-            loop {
-                tokio::select! {
-                    Some(reply_tx) = rx.recv() => {
-                        CONTAINERS.clear();
-                        let _ = reply_tx.send(()).await;
-                        break;
-                    },
-                    _ = tokio::signal::ctrl_c() => {
-                        CONTAINERS.clear();
-                        break;
-                    }
+            tokio::select! {
+                Some(reply_tx) = rx.recv() => {
+                    CONTAINERS.clear();
+                    let _ = reply_tx.send(()).await;
+                },
+                _ = tokio::signal::ctrl_c() => {
+                    CONTAINERS.clear();
                 }
             }
         });

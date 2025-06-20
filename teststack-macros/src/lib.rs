@@ -2,7 +2,7 @@ use custom::CustomContainer;
 use db::{DbContainer, DbName};
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
-use syn::{ItemFn, parse::Parse, parse_macro_input, punctuated::Punctuated};
+use syn::{parse::Parse, parse_macro_input, punctuated::Punctuated, ItemFn};
 
 mod custom;
 mod db;

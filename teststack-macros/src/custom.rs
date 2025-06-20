@@ -1,4 +1,4 @@
-use syn::{Expr, parenthesized, parse::Parse};
+use syn::{parenthesized, parse::Parse, Expr};
 
 mod keyword {
     syn::custom_keyword!(container);

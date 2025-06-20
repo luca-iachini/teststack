@@ -1,4 +1,4 @@
-use syn::{LitStr, Token, parenthesized, parse::Parse};
+use syn::{parenthesized, parse::Parse, LitStr, Token};
 
 pub mod keyword {
     syn::custom_keyword!(postgres);

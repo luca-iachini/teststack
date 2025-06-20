@@ -66,7 +66,7 @@ async fn test(rabbit: RabbitConnection) {
 }
 
 fn rabbit() -> ContainerRequest<RabbitMq> {
-    RabbitMq::default().with_tag("3.11.0-alpine").into()
+    RabbitMq::default().with_tag("3.11.0-alpine")
 }
 
 struct RabbitConnection(lapin::Connection);
