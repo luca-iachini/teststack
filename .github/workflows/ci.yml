@@ -29,8 +29,8 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
-      - name: Install Protoc
-        uses: 4w3official/setup-protoc-action@v1
+      - name: Start Docker
+        run: sudo systemctl start docker
       - name: Run cargo test
         run: cargo test --verbose --workspace --all-features
 
