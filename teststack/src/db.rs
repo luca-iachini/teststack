@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use crate::TestContainer;
 
-const STARTUP_TIMEOUT: Duration = Duration::from_secs(120);
+const STARTUP_TIMEOUT: Duration = Duration::from_secs(300);
 
 /// Configuration for the database name.
 pub enum DbName {
