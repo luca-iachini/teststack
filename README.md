@@ -90,6 +90,8 @@ impl teststack::Init<RabbitConnection> for CustomContainer {
 If you don't need any custom configuration, you can simplify the container setup by returning the image directly:
 
 ```rust
+use testcontainers_modules::rabbitmq::RabbitMq;
+
 fn rabbit() -> RabbitMq {
     RabbitMq::default()
 }
@@ -104,7 +106,6 @@ Enable a specific feature (`postgres`, `mysql`) to run dedicated database contai
 use teststack::{DbContainer, stack};
 
 #[stack(postgres(random_db_name))]
-#[rstest::rstest]
 #[tokio::test]
 async fn test(container: DbContainer) {
     let pool = sqlx::PgPool::connect(container.conf.url.as_str())

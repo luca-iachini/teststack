@@ -3009,6 +3009,7 @@ version = "0.1.0"
 dependencies = [
  "ctor",
  "dashmap",
+ "lapin",
  "once_cell",
  "sqlx",
  "testcontainers",
