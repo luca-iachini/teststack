@@ -1,4 +1,8 @@
+use std::time::Duration;
+
 use crate::TestContainer;
+
+const STARTUP_TIMEOUT: Duration = Duration::from_secs(120);
 
 /// Configuration for the database name.
 pub enum DbName {
@@ -26,12 +30,13 @@ pub mod postgres {
 
     use super::*;
     use sqlx::PgPool;
-    use testcontainers::core::ContainerPort;
+    use testcontainers::{core::ContainerPort, ImageExt};
     use testcontainers_modules::postgres::Postgres;
 
     /// Run a PostgreSQL container with the given database name.
     pub async fn run(db_name: DbName) -> DbContainer {
-        let container = crate::container(Postgres::default()).await;
+        let container =
+            crate::container(Postgres::default().with_startup_timeout(STARTUP_TIMEOUT)).await;
         let port = container
             .get_host_port_ipv4(ContainerPort::Tcp(5432))
             .await
@@ -59,12 +64,13 @@ pub mod mysql {
     use super::*;
     use crate::{Init, TestContainer};
     use sqlx::MySqlPool;
-    use testcontainers::core::ContainerPort;
+    use testcontainers::{core::ContainerPort, ImageExt};
     use testcontainers_modules::mysql::Mysql;
 
     /// Run a MySql container with the given database name.
     pub async fn run(db_name: DbName) -> DbContainer {
-        let container = crate::container(Mysql::default()).await;
+        let container =
+            crate::container(Mysql::default().with_startup_timeout(STARTUP_TIMEOUT)).await;
         let port = container
             .get_host_port_ipv4(ContainerPort::Tcp(3306))
             .await

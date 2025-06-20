@@ -29,8 +29,6 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
-      - name: Start Docker
-        run: sudo systemctl start docker
       - name: Run cargo test
         run: cargo test --verbose --workspace --all-features
 
