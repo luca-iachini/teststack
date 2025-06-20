@@ -8,6 +8,7 @@ use std::thread;
 use std::{any::TypeId, ops::Deref, pin::Pin, sync::Arc};
 use tokio::sync::mpsc;
 use tokio::sync::Mutex;
+use tokio::task::JoinSet;
 
 pub use testcontainers::core::ContainerPort;
 use testcontainers::{runners::AsyncRunner, ContainerAsync, ContainerRequest, Image};
@@ -34,6 +35,16 @@ pub async fn container<I: Image + 'static>(
         *guard = Some(container.clone());
         container
     }
+}
+
+pub async fn stack<I: Image + 'static>(
+    containers: Vec<impl Into<ContainerRequest<I>> + AsyncRunner<I> + Send + Sync + 'static>,
+) -> Vec<GenericContainer> {
+    let mut set = JoinSet::new();
+    for request in containers {
+        set.spawn(container(request));
+    }
+    set.join_all().await
 }
 
 pub trait RunningContainer: Send + Sync {

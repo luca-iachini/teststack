@@ -1,7 +1,7 @@
 use testcontainers_modules::rabbitmq::RabbitMq;
 use testcontainers_modules::testcontainers::{ContainerRequest, ImageExt};
 use teststack::DbContainer;
-use teststack::{ContainerPort, CustomContainer, stack};
+use teststack::{stack, ContainerPort, CustomContainer};
 
 #[stack(postgres(random_db_name), container(rabbit()))]
 #[tokio::test]

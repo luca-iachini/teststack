@@ -1,4 +1,4 @@
-use teststack::{DbContainer, stack};
+use teststack::{stack, DbContainer};
 
 #[stack(postgres(random_db_name))]
 #[rstest::rstest]
