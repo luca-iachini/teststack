@@ -23,21 +23,11 @@ teststack = { version = "0.1", features = ["postgres"] }
 In the example below, both tests share the same `Postgres` container instance. This reduces startup overhead and speeds up test execution. The container is automatically shut down at the end of the test harness.
 
 ```rust
-use sqlx::{MySqlPool, PgPool};
 use teststack::stack;
 
 #[stack(postgres(random_db_name))]
 #[sqlx::test]
-async fn test_postgres(pool: PgPool) {
-    sqlx::query("SELECT 1")
-        .fetch_one(&pool)
-        .await
-        .expect("failed to execute query");
-}
-
-#[stack(postgres(random_db_name))]
-#[sqlx::test]
-async fn test_postgres_2(pool: PgPool) {
+async fn test(pool: PgPool) {
     sqlx::query("SELECT 1")
         .fetch_one(&pool)
         .await
